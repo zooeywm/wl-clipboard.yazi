@@ -23,12 +23,21 @@ return {
 
 		-- ya.notify({ title = #urls, content = table.concat(urls, " "), level = "info", timeout = 5 })
 
+		-- Format the URLs for `text/uri-list` specification
+		local function encode_uri(uri)
+			return uri:gsub("([^%w%-%._~:/])", function(c)
+				return string.format("%%%02X", string.byte(c))
+			end)
+		end
+
+		local file_list_formatted = ""
+		for _, path in ipairs(urls) do
+			-- Each file path must be URI-encoded and prefixed with "file://"
+			file_list_formatted = file_list_formatted .. "file://" .. encode_uri(path) .. "\r\n"
+		end
+
 		local status, err =
-				Command("cb")
-				:arg("copy")
-				:args(urls)
-				:spawn()
-				:wait()
+			Command("wl-copy"):arg("--type"):arg("text/uri-list"):arg(file_list_formatted):spawn():wait()
 
 		if status or status.succes then
 			ya.notify({
@@ -42,10 +51,7 @@ return {
 		if not status or not status.success then
 			ya.notify({
 				title = "System Clipboard",
-				content = string.format(
-					"Could not copy selected file(s) %s",
-					status and status.code or err
-				),
+				content = string.format("Could not copy selected file(s) %s", status and status.code or err),
 				level = "error",
 				timeout = 5,
 			})
