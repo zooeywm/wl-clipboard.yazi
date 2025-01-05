@@ -18,7 +18,7 @@ Forked from: [orhnk/system-clipboard.yazi](https://github.com/orhnk/system-clipb
 ## Installation
 
 ```bash
-ya pack -a grappas/wl-clipboard.yazi
+ya pack -a grappas/wl-clipboard
 ```
 
 ## Configuration
